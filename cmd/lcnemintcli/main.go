@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
-	app "github.com/lcnem/lcnemint"
+	app "github.com/lcnem/identity"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	amino "github.com/tendermint/go-amino"
@@ -32,8 +32,8 @@ func main() {
 	config.Seal()
 
 	rootCmd := &cobra.Command{
-		Use:   "lcnemintcli",
-		Short: "lcnemint Client",
+		Use:   "identitycli",
+		Short: "Identity Client",
 	}
 
 	// Add --chain-id to persistent flags and mark it required
@@ -57,7 +57,7 @@ func main() {
 		client.NewCompletionCmd(rootCmd, true),
 	)
 
-	executor := cli.PrepareMainCmd(rootCmd, "LCNEMINT", app.DefaultCLIHome)
+	executor := cli.PrepareMainCmd(rootCmd, "IDENTITY", app.DefaultCLIHome)
 	err := executor.Execute()
 	if err != nil {
 		panic(err)

@@ -14,7 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/staking"
-	app "github.com/lcnem/lcnemint"
+	app "github.com/lcnem/identity"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
@@ -34,8 +34,8 @@ func main() {
 	ctx := server.NewDefaultContext()
 
 	rootCmd := &cobra.Command{
-		Use:               "lcnemintd",
-		Short:             "lcnemint App Daemon (server)",
+		Use:               "identityd",
+		Short:             "Identity App Daemon (server)",
 		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
 	}
 	// CLI commands to initialize the chain
@@ -53,7 +53,7 @@ func main() {
 	server.AddCommands(ctx, cdc, rootCmd, newApp, exportAppStateAndTMValidators)
 
 	// prepare and add flags
-	executor := cli.PrepareBaseCmd(rootCmd, "LCNEMINT", app.DefaultNodeHome)
+	executor := cli.PrepareBaseCmd(rootCmd, "IDENTITY", app.DefaultNodeHome)
 	err := executor.Execute()
 	if err != nil {
 		panic(err)
@@ -61,7 +61,7 @@ func main() {
 }
 
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
-	return app.NewLcnemintApp(logger, db)
+	return app.NewIdentityApp(logger, db)
 }
 
 func exportAppStateAndTMValidators(
@@ -69,15 +69,15 @@ func exportAppStateAndTMValidators(
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 
 	if height != -1 {
-		lcnemintApp := app.NewLcnemintApp(logger, db)
-		err := lcnemintApp.LoadHeight(height)
+		identityApp := app.NewIdentityApp(logger, db)
+		err := identityApp.LoadHeight(height)
 		if err != nil {
 			return nil, nil, err
 		}
-		return lcnemintApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+		return identityApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 	}
 
-	lcnemintApp := app.NewLcnemintApp(logger, db)
+	identityApp := app.NewIdentityApp(logger, db)
 
-	return lcnemintApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+	return identityApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }

@@ -1,4 +1,4 @@
-module github.com/lcnem/lcnemint
+module github.com/lcnem/identity
 
 go 1.13
 
