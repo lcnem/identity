@@ -1,6 +1,8 @@
 package types
 
 import (
+	"regexp"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -15,9 +17,11 @@ type MsgSet struct {
 }
 
 // NewMsgSet is a constructor function
-func NewMsgSet(address sdk.AccAddress) MsgSet {
+func NewMsgSet(address sdk.AccAddress, key string, value string) MsgSet {
 	return MsgSet{
 		Address: address,
+		Key:     key,
+		Value:   value,
 	}
 }
 
@@ -29,6 +33,9 @@ func (msg MsgSet) Type() string { return "set" }
 
 // ValidateBasic runs stateless checks on the message
 func (msg MsgSet) ValidateBasic() sdk.Error {
+	if !regexp.MustCompile("^[a-z]([a-z0-9]|-)*$").Match([]byte(msg.Key)) {
+		return ErrInvalidKey()
+	}
 	if msg.Address.Empty() {
 		return sdk.ErrInvalidAddress(msg.Address.String())
 	}

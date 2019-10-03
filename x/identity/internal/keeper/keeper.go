@@ -5,8 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/lcnem/identity/x/identity/internal/types"
 )
 
 // Keeper maintains the link to storage and exposes getter/setter methods for the various parts of the state machine
@@ -17,7 +16,7 @@ type Keeper struct {
 }
 
 // NewKeeper creates new instances of the identity Keeper
-func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, bankKeeper bank.Keeper, supplyKeeper supply.Keeper) Keeper {
+func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey) Keeper {
 	return Keeper{
 		cdc:      cdc,
 		storeKey: storeKey,
@@ -58,7 +57,7 @@ func (k Keeper) Import(ctx sdk.Context, fromAddress sdk.AccAddress, toAddress sd
 	for key, _ := range from {
 		_, exist := to[key]
 		if exist {
-			return ErrImportConflict()
+			return types.ErrImportConflict()
 		}
 	}
 	for key, value := range from {

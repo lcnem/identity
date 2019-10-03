@@ -8,8 +8,14 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = ModuleName
 
-	CodeImportConflict sdk.CodeType = 1
+	CodeInvalidKey     sdk.CodeType = 1
+	CodeImportConflict sdk.CodeType = 2
 )
+
+// ErrInvalidKey ErrInvalidKey
+func ErrInvalidKey() sdk.Error {
+	return sdk.NewError(DefaultCodespace, CodeInvalidKey, "Key must start with [a-z] and available characters are [a-z],[0-9],-")
+}
 
 // ErrImportConflict ErrImportConflict
 func ErrImportConflict() sdk.Error {

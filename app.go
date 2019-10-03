@@ -26,7 +26,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-	securities "github.com/lcnem/identity/x/identity"
+	"github.com/lcnem/identity/x/identity"
 )
 
 const appName = "Identity"
@@ -197,9 +197,9 @@ func NewIdentityApp(
 		keys[nft.StoreKey],
 	)
 
-	app.identiyKeeper = securities.NewKeeper(
+	app.identityKeeper = identity.NewKeeper(
 		app.cdc,
-		keys[securities.StoreKey],
+		keys[identity.StoreKey],
 	)
 
 	app.mm = module.NewManager(
@@ -211,7 +211,7 @@ func NewIdentityApp(
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.stakingAccountKeeper, app.supplyKeeper),
 		nft.NewAppModule(app.nftKeeper),
-		indentiy.NewAppModule(app.indentiyKeeper),
+		identity.NewAppModule(app.identityKeeper),
 	)
 
 	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName)

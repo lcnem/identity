@@ -38,7 +38,7 @@ func setHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the message
-		msg := types.NewMsgSetOwner(address, req.Key, req.Value)
+		msg := types.NewMsgSet(address, req.Key, req.Value)
 		err = msg.ValidateBasic()
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -117,7 +117,7 @@ func deleteHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the message
-		msg := types.NewMsgBurnToken(address)
+		msg := types.NewMsgDelete(address)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

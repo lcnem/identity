@@ -24,17 +24,12 @@ func NewHandler(keeper Keeper) sdk.Handler {
 }
 
 func handleMsgSet(ctx sdk.Context, keeper Keeper, msg MsgSet) sdk.Result {
-	owner := keeper.GetOwner(ctx)
-	if !owner.Empty() && !owner.Equals(msg.Owner) {
-		return sdk.ErrUnauthorized(msg.Owner.String()).Result()
-	}
-
-	keeper.SetOwner(ctx, msg.NewOwner)
+	keeper.Set(ctx, msg.Address, msg.Key, msg.Value)
 	return sdk.Result{}
 }
 
 func handleMsgImport(ctx sdk.Context, keeper Keeper, msg MsgImport) sdk.Result {
-	err := keeper.Import()
+	err := keeper.Import(ctx, msg.FromAddress, msg.ToAddress)
 	if err != nil {
 		return err.Result()
 	}
@@ -43,10 +38,7 @@ func handleMsgImport(ctx sdk.Context, keeper Keeper, msg MsgImport) sdk.Result {
 }
 
 func handleMsgDelete(ctx sdk.Context, keeper Keeper, msg MsgDelete) sdk.Result {
-	err := keeper.Delete()
-	if err != nil {
-		return err.Result()
-	}
+	keeper.Delete(ctx, msg.Address)
 
 	return sdk.Result{}
 }

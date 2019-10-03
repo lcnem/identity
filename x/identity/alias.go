@@ -2,7 +2,7 @@ package identity
 
 import (
 	"github.com/lcnem/identity/x/identity/internal/types"
-	"github.com/lcnem/identity/x/identity/keeper"
+	"github.com/lcnem/identity/x/identity/internal/keeper"
 )
 
 // nolint

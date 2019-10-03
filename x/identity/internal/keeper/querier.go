@@ -29,7 +29,7 @@ func queryAddress(ctx sdk.Context, path []string, req abci.RequestQuery, keeper 
 	}
 
 	obj := keeper.Get(ctx, address)
-	res, _ := json.Marshall(obj)
+	res, _ := json.Marshal(obj)
 
 	return res, nil
 }
