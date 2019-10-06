@@ -13,5 +13,5 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) 
 	r.HandleFunc(fmt.Sprintf("/%s/{address}", storeName), getHandler(cliCtx, storeName)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/%s/{address}", storeName), setHandler(cliCtx)).Methods("PUT")
 	r.HandleFunc(fmt.Sprintf("/%s/import", storeName), importHandler(cliCtx)).Methods("POST")
-	r.HandleFunc(fmt.Sprintf("/%s/{delete}/delete", storeName), deleteHandler(cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/%s/{address}/delete", storeName), deleteHandler(cliCtx)).Methods("POST")
 }
