@@ -52,7 +52,6 @@ func setHandler(cliCtx context.CLIContext) http.HandlerFunc {
 type importReq struct {
 	BaseReq     rest.BaseReq `json:"base_req"`
 	FromAddress string       `json:"from_address"`
-	ToAddress   string       `json:"to_address"`
 }
 
 func importHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -75,7 +74,7 @@ func importHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		toAddress, err := sdk.AccAddressFromBech32(req.ToAddress)
+		toAddress, err := sdk.AccAddressFromBech32(mux.Vars(r)["address"])
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

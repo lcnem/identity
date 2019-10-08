@@ -54,7 +54,7 @@ func (k Keeper) Import(ctx sdk.Context, fromAddress sdk.AccAddress, toAddress sd
 	from := k.Get(ctx, fromAddress)
 	to := k.Get(ctx, toAddress)
 
-	for key, _ := range from {
+	for key := range from {
 		_, exist := to[key]
 		if exist {
 			return types.ErrImportConflict()
