@@ -6,6 +6,9 @@ WORKDIR /go/src/github.com/lcnem/identity
 # Add source files
 COPY . .
 
+RUN go install ./cmd/identityd
+RUN go install ./cmd/identitycli
+
 # Final image
 FROM alpine:edge
 
