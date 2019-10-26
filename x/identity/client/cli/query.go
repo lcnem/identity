@@ -33,7 +33,7 @@ func getCmdGet(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryAddress), nil)
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryAddress), []byte(args[0]))
 			if err != nil {
 				fmt.Printf(err.Error())
 				return nil
