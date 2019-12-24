@@ -11,17 +11,15 @@ const RouterKey = ModuleName // this was defined in your key.go file
 
 // MsgSet defines the Set message
 type MsgSet struct {
-	Address sdk.AccAddress `json:"address"`
-	Key     string         `json:"key"`
-	Value   string         `json:"value"`
+	Address       sdk.AccAddress    `json:"address"`
+	KeyValuePairs map[string]string `json:"key_value_pairs"`
 }
 
 // NewMsgSet is a constructor function
-func NewMsgSet(address sdk.AccAddress, key string, value string) MsgSet {
+func NewMsgSet(address sdk.AccAddress, keyValuePairs map[string]string) MsgSet {
 	return MsgSet{
-		Address: address,
-		Key:     key,
-		Value:   value,
+		Address:       address,
+		KeyValuePairs: keyValuePairs,
 	}
 }
 
@@ -33,9 +31,13 @@ func (msg MsgSet) Type() string { return "set" }
 
 // ValidateBasic runs stateless checks on the message
 func (msg MsgSet) ValidateBasic() sdk.Error {
-	if !regexp.MustCompile("^[a-z]([a-z0-9]|-)*$").Match([]byte(msg.Key)) {
-		return ErrInvalidKey()
+	var exp = regexp.MustCompile("^[a-z_][a-z_0-9]*$")
+	for key := range msg.KeyValuePairs {
+		if !exp.Match([]byte(key)) {
+			return ErrInvalidKey()
+		}
 	}
+
 	if msg.Address.Empty() {
 		return sdk.ErrInvalidAddress(msg.Address.String())
 	}

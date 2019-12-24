@@ -35,14 +35,16 @@ func (k Keeper) Get(ctx sdk.Context, address sdk.AccAddress) map[string]string {
 }
 
 // Set set
-func (k Keeper) Set(ctx sdk.Context, address sdk.AccAddress, key string, value string) {
+func (k Keeper) Set(ctx sdk.Context, address sdk.AccAddress, keyValuePairs map[string]string) {
 	store := ctx.KVStore(k.storeKey)
 
 	m := k.Get(ctx, address)
-	if len(value) == 0 {
-		delete(m, key)
-	} else {
-		m[key] = value
+	for key, value := range keyValuePairs {
+		if len(value) == 0 {
+			delete(m, key)
+		} else {
+			m[key] = value
+		}
 	}
 
 	bz, _ := json.Marshal(m)
@@ -60,9 +62,7 @@ func (k Keeper) Import(ctx sdk.Context, fromAddress sdk.AccAddress, toAddress sd
 			return types.ErrImportConflict()
 		}
 	}
-	for key, value := range from {
-		k.Set(ctx, toAddress, key, value)
-	}
+	k.Set(ctx, toAddress, from)
 
 	return nil
 }
