@@ -13,9 +13,8 @@ import (
 )
 
 type setReq struct {
-	BaseReq rest.BaseReq `json:"base_req"`
-	Key     string       `json:"key"`
-	Value   string       `json:"value"`
+	BaseReq       rest.BaseReq      `json:"base_req"`
+	KeyValuePairs map[string]string `json:"key_value_pairs"`
 }
 
 func setHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -38,7 +37,7 @@ func setHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the message
-		msg := types.NewMsgSet(address, req.Key, req.Value)
+		msg := types.NewMsgSet(address, req.KeyValuePairs)
 		err = msg.ValidateBasic()
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
