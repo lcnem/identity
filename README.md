@@ -28,7 +28,7 @@ $ docker run -it --name identity_node -p 26656:26656 -p 26657:26657 -v ~/.identi
 
 ノードが動作しているコンテナへ接続して実行します。
 
->$ docker exec -d -it identity_node identitycli rest-server --chain-id t --trust-node=true --laddr tcp://0.0.0.0:1318
+>$ docker exec -d -it identity_node identitycli rest-server --chain-id t --trust-node=true --laddr tcp://0.0.0.0:1317
 
 ## CLIコマンド
 
@@ -45,3 +45,9 @@ CLIコマンドの詳細については `identitycli --help` をご覧くださ�
 
 例）
 >http://localhost:1317/node_info
+
+## その他
+
+identityd と identitycli 間の通信で使用されているポート番号（26656、26657）や外部に公開するRESTサーバのポート番号（1317）は適宜変更してください。
+
+複数のノードやRESTサーバーを複数起動する場合などは、ポート番号の衝突が発生しないように調整してください。
