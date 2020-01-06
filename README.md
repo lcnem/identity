@@ -24,19 +24,24 @@ $ docker run -it -p 26656:26656 -p 26657:26657 -v ~/.identityd:/root/.identityd 
 $ docker run -it --name identity_node -p 26656:26656 -p 26657:26657 -v ~/.identityd:/root/.identityd -v ~/.identitycli:/root/.identitycli lcnem/identity identityd start
 ```
 
-以下はノードが動作しているコンテナへ接続して実行されます。
+## RESTサーバー起動
 
-CLIコマンドを直接操作したい場合
+ノードが動作しているコンテナへ接続して実行します。
+
+>$ docker exec -d -it identity_node identitycli rest-server --chain-id t --trust-node=true --laddr tcp://0.0.0.0:1318
+
+## CLIコマンド
+
+ノードが動作しているコンテナへ接続して実行します。
 >$ docker exec -it identity_node sh
+
+シェルに接続しますので、CLIコマンドを直接操作できます。
 
 CLIコマンドの詳細については `identitycli --help` をご覧ください。
 
-RESTサーバー起動
->$ docker exec -d -it identity_node identitycli rest-server --chain-id t --trust-node=true --laddr tcp://0.0.0.0:1318
-
 ## RESTサーバーへのアクセス
 
-通常は `identity-client-ts` クライアントを利用してRESTへアクセスしますが、ダイレクトにアクセスすることも可能です。
+通常は [`identity-client-ts`](https://github.com/lcnem/identity-client-ts) クライアントを利用してRESTへアクセスしますが、ダイレクトにアクセスすることも可能です。
 
 例）
 >http://localhost:1317/node_info
