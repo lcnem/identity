@@ -20,7 +20,7 @@ $ docker run -it -p 26656:26656 -p 26657:26657 -v ~/.identityd:/root/.identityd 
 3. `moniker` を要求されるので、 `zeus` などと入力。
 4. `chain-id` を要求されるので、 `t` などと入力。
 5. パスフレーズを要求されるので 2. と同じパスフレーズを入力。
-    genesisを含めた必要な情報が、 `~/identityd` `~/identitycli` に保存されます。
+    genesisを含めた必要な情報が、 `~/.identityd` `~/.identitycli` に保存されます。
 
 [コマンド実行例](docs/setup-identity.md)
 
