@@ -42,7 +42,7 @@ $ docker run -it --name identity_node -p 26656:26656 -p 26657:26657 -p 1317:1317
 
 ノードが動作しているコンテナへ接続して実行します。
 
->$ docker exec -d -it identity_node identitycli rest-server --chain-id t --trust-node=true --laddr tcp://0.0.0.0:1317
+>$ docker exec -it identity_node identitycli rest-server --chain-id t --trust-node=true --laddr tcp://0.0.0.0:1317
 
 ## CLIコマンド
 
