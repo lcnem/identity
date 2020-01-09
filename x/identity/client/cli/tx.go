@@ -41,7 +41,7 @@ func getCmdSet(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			msg := types.NewMsgSet(cliCtx.GetFromAddress(), args[0], args[1])
+			msg := types.NewMsgSet(cliCtx.GetFromAddress(), map[string]string{args[0]: args[1]})
 			err := msg.ValidateBasic()
 			if err != nil {
 				return err
