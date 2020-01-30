@@ -5,13 +5,14 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/lcnem/identity/x/identity/internal/types"
 	"github.com/spf13/cobra"
 )
 
-// GetQueryCmd returns query commands
-func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
+// nolint
+func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	coinQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Querying commands for the idnetity module",
@@ -19,13 +20,13 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	coinQueryCmd.AddCommand(client.GetCommands(
-		getCmdGet(storeKey, cdc),
+	coinQueryCmd.AddCommand(flags.GetCommands(
+		getCmdGet(cdc),
 	)...)
 	return coinQueryCmd
 }
 
-func getCmdGet(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func getCmdGet(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "get [address]",
 		Short: "get address data",
@@ -33,7 +34,7 @@ func getCmdGet(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryAddress), []byte(args[0]))
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryAddress), []byte(args[0]))
 			if err != nil {
 				fmt.Printf(err.Error())
 				return nil

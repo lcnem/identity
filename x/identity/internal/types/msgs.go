@@ -4,18 +4,19 @@ import (
 	"regexp"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// RouterKey is the module name router key
-const RouterKey = ModuleName // this was defined in your key.go file
+// nolint
+const RouterKey = ModuleName
 
-// MsgSet defines the Set message
+//nolint
 type MsgSet struct {
 	Address       sdk.AccAddress    `json:"address"`
 	KeyValuePairs map[string]string `json:"key_value_pairs"`
 }
 
-// NewMsgSet is a constructor function
+//nolint
 func NewMsgSet(address sdk.AccAddress, keyValuePairs map[string]string) MsgSet {
 	return MsgSet{
 		Address:       address,
@@ -23,45 +24,45 @@ func NewMsgSet(address sdk.AccAddress, keyValuePairs map[string]string) MsgSet {
 	}
 }
 
-// Route should return the name of the module
+// nolint
 func (msg MsgSet) Route() string { return RouterKey }
 
-// Type should return the action
+// nolint
 func (msg MsgSet) Type() string { return "set" }
 
-// ValidateBasic runs stateless checks on the message
-func (msg MsgSet) ValidateBasic() sdk.Error {
+// nolint
+func (msg MsgSet) ValidateBasic() error {
 	var exp = regexp.MustCompile("^[a-z_][a-z_0-9]*$")
 	for key := range msg.KeyValuePairs {
 		if !exp.Match([]byte(key)) {
-			return ErrInvalidKey()
+			return ErrInvalidKey
 		}
 	}
 
 	if msg.Address.Empty() {
-		return sdk.ErrInvalidAddress(msg.Address.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Address.String())
 	}
 
 	return nil
 }
 
-// GetSignBytes encodes the message for signing
+// nolint
 func (msg MsgSet) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-// GetSigners defines whose signature is required
+// nolint
 func (msg MsgSet) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Address}
 }
 
-// MsgImport defines a Import message
+// nolint
 type MsgImport struct {
 	FromAddress sdk.AccAddress `json:"from_address"`
 	ToAddress   sdk.AccAddress `json:"to_address"`
 }
 
-// NewMsgImport is a constructor function
+// nolint
 func NewMsgImport(fromAddress sdk.AccAddress, toAddress sdk.AccAddress) MsgImport {
 	return MsgImport{
 		FromAddress: fromAddress,
@@ -69,67 +70,67 @@ func NewMsgImport(fromAddress sdk.AccAddress, toAddress sdk.AccAddress) MsgImpor
 	}
 }
 
-// Route should return the name of the module
+// nolint
 func (msg MsgImport) Route() string { return RouterKey }
 
-// Type should return the action
+// nolint
 func (msg MsgImport) Type() string { return "import" }
 
-// ValidateBasic runs stateless checks on the message
-func (msg MsgImport) ValidateBasic() sdk.Error {
+// nolint
+func (msg MsgImport) ValidateBasic() error {
 	if msg.FromAddress.Empty() {
-		return sdk.ErrInvalidAddress(msg.FromAddress.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.FromAddress.String())
 	}
 	if msg.ToAddress.Empty() {
-		return sdk.ErrInvalidAddress(msg.ToAddress.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.ToAddress.String())
 	}
 
 	return nil
 }
 
-// GetSignBytes encodes the message for signing
+// nolint
 func (msg MsgImport) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-// GetSigners defines whose signature is required
+// nolint
 func (msg MsgImport) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.ToAddress}
 }
 
-// MsgDelete defines a Delete message
+// nolint
 type MsgDelete struct {
 	Address sdk.AccAddress `json:"address"`
 }
 
-// NewMsgDelete is a constructor function
+// nolint
 func NewMsgDelete(address sdk.AccAddress) MsgDelete {
 	return MsgDelete{
 		Address: address,
 	}
 }
 
-// Route should return the name of the module
+// nolint
 func (msg MsgDelete) Route() string { return RouterKey }
 
-// Type should return the action
+// nolint
 func (msg MsgDelete) Type() string { return "delete" }
 
-// ValidateBasic runs stateless checks on the message
-func (msg MsgDelete) ValidateBasic() sdk.Error {
+// nolint
+func (msg MsgDelete) ValidateBasic() error {
 	if msg.Address.Empty() {
-		return sdk.ErrInvalidAddress(msg.Address.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Address.String())
 	}
 
 	return nil
 }
 
-// GetSignBytes encodes the message for signing
+// nolint
 func (msg MsgDelete) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-// GetSigners defines whose signature is required
+// nolint
 func (msg MsgDelete) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Address}
 }

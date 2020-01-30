@@ -4,11 +4,13 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
 // NewHandler returns a handler
 func NewHandler(keeper Keeper) sdk.Handler {
-	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		switch msg := msg.(type) {
 		case MsgSet:
 			return handleMsgSet(ctx, keeper, msg)
@@ -18,27 +20,49 @@ func NewHandler(keeper Keeper) sdk.Handler {
 			return handleMsgDelete(ctx, keeper, msg)
 		default:
 			errMsg := fmt.Sprintf("Unrecognized identity Msg type: %v", msg.Type())
-			return sdk.ErrUnknownRequest(errMsg).Result()
+			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 	}
 }
 
-func handleMsgSet(ctx sdk.Context, keeper Keeper, msg MsgSet) sdk.Result {
-	keeper.Set(ctx, msg.Address, msg.Key, msg.Value)
-	return sdk.Result{}
+func handleMsgSet(ctx sdk.Context, keeper Keeper, msg MsgSet) (*sdk.Result, error) {
+	keeper.Set(ctx, msg.Address, msg.KeyValuePairs)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	)
+
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
-func handleMsgImport(ctx sdk.Context, keeper Keeper, msg MsgImport) sdk.Result {
+func handleMsgImport(ctx sdk.Context, keeper Keeper, msg MsgImport) (*sdk.Result, error) {
 	err := keeper.Import(ctx, msg.FromAddress, msg.ToAddress)
 	if err != nil {
-		return err.Result()
+		return nil, err
 	}
 
-	return sdk.Result{}
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	)
+
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
-func handleMsgDelete(ctx sdk.Context, keeper Keeper, msg MsgDelete) sdk.Result {
+func handleMsgDelete(ctx sdk.Context, keeper Keeper, msg MsgDelete) (*sdk.Result, error) {
 	keeper.Delete(ctx, msg.Address)
 
-	return sdk.Result{}
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	)
+
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }

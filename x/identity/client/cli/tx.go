@@ -1,10 +1,13 @@
 package cli
 
 import (
+	"bufio"
+
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -13,8 +16,8 @@ import (
 )
 
 // GetTxCmd is GetTxCmd
-func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
-	coinTxCmd := &cobra.Command{
+func GetTxCmd(cdc *codec.Codec) *cobra.Command {
+	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Identity transaction subcommands",
 		DisableFlagParsing:         true,
@@ -22,13 +25,13 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	coinTxCmd.AddCommand(client.PostCommands(
+	txCmd.AddCommand(flags.PostCommands(
 		getCmdSet(cdc),
 		getCmdImport(cdc),
 		getCmdDelete(cdc),
 	)...)
 
-	return coinTxCmd
+	return txCmd
 }
 
 func getCmdSet(cdc *codec.Codec) *cobra.Command {
@@ -37,9 +40,9 @@ func getCmdSet(cdc *codec.Codec) *cobra.Command {
 		Short: "set address data",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
 
 			msg := types.NewMsgSet(cliCtx.GetFromAddress(), map[string]string{args[0]: args[1]})
 			err := msg.ValidateBasic()
@@ -58,9 +61,9 @@ func getCmdImport(cdc *codec.Codec) *cobra.Command {
 		Short: "import address data",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
 
 			toAddress, err := sdk.AccAddressFromBech32(args[0])
 			if err != nil {
@@ -84,9 +87,9 @@ func getCmdDelete(cdc *codec.Codec) *cobra.Command {
 		Short: "delete address data",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
 
 			msg := types.NewMsgDelete(cliCtx.GetFromAddress())
 			err := msg.ValidateBasic()

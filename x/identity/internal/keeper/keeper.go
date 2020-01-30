@@ -8,14 +8,14 @@ import (
 	"github.com/lcnem/identity/x/identity/internal/types"
 )
 
-// Keeper maintains the link to storage and exposes getter/setter methods for the various parts of the state machine
+// nolint
 type Keeper struct {
-	cdc *codec.Codec // The wire codec for binary encoding/decoding.
+	cdc *codec.Codec
 
-	storeKey sdk.StoreKey // Unexposed key to access store from sdk.Context
+	storeKey sdk.StoreKey
 }
 
-// NewKeeper creates new instances of the identity Keeper
+// nolint
 func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey) Keeper {
 	return Keeper{
 		cdc:      cdc,
@@ -23,7 +23,7 @@ func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey) Keeper {
 	}
 }
 
-// Get get
+// nolint
 func (k Keeper) Get(ctx sdk.Context, address sdk.AccAddress) map[string]string {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get([]byte(address.String()))
@@ -34,7 +34,7 @@ func (k Keeper) Get(ctx sdk.Context, address sdk.AccAddress) map[string]string {
 	return m
 }
 
-// Set set
+// nolint
 func (k Keeper) Set(ctx sdk.Context, address sdk.AccAddress, keyValuePairs map[string]string) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -51,15 +51,15 @@ func (k Keeper) Set(ctx sdk.Context, address sdk.AccAddress, keyValuePairs map[s
 	store.Set([]byte(address.String()), bz)
 }
 
-// Import import
-func (k Keeper) Import(ctx sdk.Context, fromAddress sdk.AccAddress, toAddress sdk.AccAddress) sdk.Error {
+// nolint
+func (k Keeper) Import(ctx sdk.Context, fromAddress sdk.AccAddress, toAddress sdk.AccAddress) error {
 	from := k.Get(ctx, fromAddress)
 	to := k.Get(ctx, toAddress)
 
 	for key := range from {
 		_, exist := to[key]
 		if exist {
-			return types.ErrImportConflict()
+			return types.ErrImportConflict
 		}
 	}
 	k.Set(ctx, toAddress, from)
@@ -67,7 +67,7 @@ func (k Keeper) Import(ctx sdk.Context, fromAddress sdk.AccAddress, toAddress sd
 	return nil
 }
 
-// Delete delete
+// nolint
 func (k Keeper) Delete(ctx sdk.Context, address sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete([]byte(address.String()))
