@@ -20,7 +20,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
-	"github.com/cosmos/cosmos-sdk/x/nft"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
@@ -48,7 +47,6 @@ var (
 		params.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
-		nft.AppModuleBasic{},
 		identity.AppModuleBasic{},
 	)
 	// account permissions
@@ -86,7 +84,6 @@ type IdentityApp struct {
 	slashingKeeper       slashing.Keeper
 	distrKeeper          distr.Keeper
 	supplyKeeper         supply.Keeper
-	nftKeeper            nft.Keeper
 	identityKeeper       identity.Keeper
 	paramsKeeper         params.Keeper
 
@@ -110,7 +107,7 @@ func NewIdentityApp(
 	bApp.SetAppVersion(version.Version)
 
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
-		supply.StoreKey, distr.StoreKey, slashing.StoreKey, nft.StoreKey, identity.StoreKey, params.StoreKey)
+		supply.StoreKey, distr.StoreKey, slashing.StoreKey, identity.StoreKey, params.StoreKey)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -192,11 +189,6 @@ func NewIdentityApp(
 			app.slashingKeeper.Hooks()),
 	)
 
-	app.nftKeeper = nft.NewKeeper(
-		app.cdc,
-		keys[nft.StoreKey],
-	)
-
 	app.identityKeeper = identity.NewKeeper(
 		app.cdc,
 		keys[identity.StoreKey],
@@ -210,7 +202,6 @@ func NewIdentityApp(
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.stakingAccountKeeper, app.supplyKeeper),
-		nft.NewAppModule(app.nftKeeper),
 		identity.NewAppModule(app.identityKeeper),
 	)
 
@@ -226,7 +217,6 @@ func NewIdentityApp(
 		auth.ModuleName,
 		bank.ModuleName,
 		slashing.ModuleName,
-		nft.ModuleName,
 		identity.ModuleName,
 		supply.ModuleName,
 		genutil.ModuleName,
