@@ -27,7 +27,7 @@ jobs:
     - name: Build
       run: |
         go build -v ./cmd/identitycli
-        go build -v ./cmd/
+        go build -v ./cmd/identityd
     
     - name: Test
       run: |
