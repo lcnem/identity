@@ -10,7 +10,7 @@ RUN go install ./cmd/identityd
 RUN go install ./cmd/identitycli
 
 # Final image
-FROM alpine:edge
+FROM ubuntu:latest
 
 # Install ca-certificates
 RUN apk add --update ca-certificates

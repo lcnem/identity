@@ -283,6 +283,7 @@ func NewInitApp(
 		upgrade.NewAppModule(app.upgradeKeeper),
 		evidence.NewAppModule(app.evidenceKeeper),
 		// TODO: Add your module(s)
+
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 	)
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -304,6 +305,7 @@ func NewInitApp(
 		gov.ModuleName,
 		mint.ModuleName,
 		// TODO: Add your module(s)
+
 		supply.ModuleName,
 		crisis.ModuleName,
 		genutil.ModuleName,
@@ -326,6 +328,24 @@ func NewInitApp(
 			auth.DefaultSigVerificationGasConsumer,
 		),
 	)
+
+	// create the simulation manager and define the order of the modules for deterministic simulations
+	//
+	// NOTE: This is not required for apps that don't use the simulator for fuzz testing
+	// transactions.
+	app.sm = module.NewSimulationManager(
+		auth.NewAppModule(app.accountKeeper),
+		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
+		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
+		gov.NewAppModule(app.govKeeper, app.accountKeeper, app.supplyKeeper),
+		mint.NewAppModule(app.mintKeeper),
+		distr.NewAppModule(app.distrKeeper, app.accountKeeper, app.supplyKeeper, app.stakingKeeper),
+		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
+		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
+		// TODO: Add your module(s)
+	)
+
+	app.sm.RegisterStoreDecoders()
 
 	// initialize stores
 	app.MountKVStores(keys)
