@@ -1,23 +1,12 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// DefaultCodespace is the Module Name
-const (
-	DefaultCodespace sdk.CodespaceType = ModuleName
-
-	CodeInvalidKey     sdk.CodeType = 1
-	CodeImportConflict sdk.CodeType = 2
+// TODO: Fill out some custom errors for the module
+// You can see how they are constructed below:
+var (
+	ErrInvalidKey      = sdkerrors.Register(ModuleName, 1, "Available characters are a-z,0-9,_")
+	ErrIsNotRegistered = sdkerrors.Register(ModuleName, 2, "Address is not registered")
 )
-
-// ErrInvalidKey ErrInvalidKey
-func ErrInvalidKey() sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodeInvalidKey, "Key must start with [a-z] and available characters are [a-z],[0-9],-")
-}
-
-// ErrImportConflict ErrImportConflict
-func ErrImportConflict() sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodeImportConflict, "Conflict was occured in import")
-}

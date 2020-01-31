@@ -7,6 +7,8 @@ const (
 	// StoreKey to be used when creating the KVStore
 	StoreKey = ModuleName
 
-	// QueryAddress QueryAddress
-	QueryAddress = "address"
+  // RouterKey to be used for routing msgs
+  RouterKey = ModuleName
+
+	QuerierRoute = ModuleName
 )

@@ -1,44 +1,63 @@
 package keeper
 
 import (
-	"encoding/json"
+	"fmt"
+
+	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/lcnem/identity/x/identity/internal/types"
 )
 
-// Keeper maintains the link to storage and exposes getter/setter methods for the various parts of the state machine
+// Keeper of the identity store
 type Keeper struct {
-	cdc *codec.Codec // The wire codec for binary encoding/decoding.
-
-	storeKey sdk.StoreKey // Unexposed key to access store from sdk.Context
+	storeKey   sdk.StoreKey
+	cdc        *codec.Codec
 }
 
-// NewKeeper creates new instances of the identity Keeper
-func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey) Keeper {
-	return Keeper{
-		cdc:      cdc,
-		storeKey: storeKey,
+// NewKeeper creates a identity keeper
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey) Keeper {
+	keeper := Keeper{
+		storeKey:   key,
 	}
+	return keeper
 }
 
-// Get get
-func (k Keeper) Get(ctx sdk.Context, address sdk.AccAddress) map[string]string {
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get([]byte(address.String()))
-
-	m := map[string]string{}
-	json.Unmarshal(bz, &m)
-
-	return m
+// Logger returns a module-specific logger.
+func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-// Set set
-func (k Keeper) Set(ctx sdk.Context, address sdk.AccAddress, keyValuePairs map[string]string) {
+// Get returns the pubkey from the adddress-pubkey relation
+func (k Keeper) Get(ctx sdk.Context, key string) (map[string]string, error) {
 	store := ctx.KVStore(k.storeKey)
+	var item map[string]string
+	byteKey := []byte(key)
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(byteKey), &item)
+	if err != nil {
+		return nil, err
+	}
+	return item, nil
+}
 
-	m := k.Get(ctx, address)
+func (k Keeper) set(ctx sdk.Context, key string, value map[string]string) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(value)
+	store.Set([]byte(key), bz)
+}
+
+func (k Keeper) delete(ctx sdk.Context, key string) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete([]byte(key))
+}
+
+// Set Set
+func (k Keeper) Set(ctx sdk.Context, address sdk.AccAddress, keyValuePairs map[string]string) map[string]string {
+	m, err := k.Get(ctx, address.String())
+	if err != nil {
+		m = map[string]string{}
+	}
 	for key, value := range keyValuePairs {
 		if len(value) == 0 {
 			delete(m, key)
@@ -47,21 +66,18 @@ func (k Keeper) Set(ctx sdk.Context, address sdk.AccAddress, keyValuePairs map[s
 		}
 	}
 
-	bz, _ := json.Marshal(m)
-	store.Set([]byte(address.String()), bz)
+	k.set(ctx, address.String(), m)
+
+	return m
 }
 
 // Import import
-func (k Keeper) Import(ctx sdk.Context, fromAddress sdk.AccAddress, toAddress sdk.AccAddress) sdk.Error {
-	from := k.Get(ctx, fromAddress)
-	to := k.Get(ctx, toAddress)
-
-	for key := range from {
-		_, exist := to[key]
-		if exist {
-			return types.ErrImportConflict()
-		}
+func (k Keeper) Import(ctx sdk.Context, fromAddress sdk.AccAddress, toAddress sdk.AccAddress) error {
+	from, err := k.Get(ctx, fromAddress.String())
+	if err != nil {
+		return types.ErrIsNotRegistered
 	}
+
 	k.Set(ctx, toAddress, from)
 
 	return nil
@@ -69,6 +85,5 @@ func (k Keeper) Import(ctx sdk.Context, fromAddress sdk.AccAddress, toAddress sd
 
 // Delete delete
 func (k Keeper) Delete(ctx sdk.Context, address sdk.AccAddress) {
-	store := ctx.KVStore(k.storeKey)
-	store.Delete([]byte(address.String()))
+	k.delete(ctx, address.String())
 }
