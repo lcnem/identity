@@ -4,8 +4,9 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// nolint
+// TODO: Fill out some custom errors for the module
+// You can see how they are constructed below:
 var (
-	ErrInvalidKey     = sdkerrors.Register(ModuleName, 1, "Key must start with [a-z] and available characters are [a-z],[0-9],_")
-	ErrImportConflict = sdkerrors.Register(ModuleName, 2, "Conflict was occured in import")
+	ErrInvalidKey      = sdkerrors.Register(ModuleName, 1, "Available characters are a-z,0-9,_")
+	ErrIsNotRegistered = sdkerrors.Register(ModuleName, 2, "Address is not registered")
 )

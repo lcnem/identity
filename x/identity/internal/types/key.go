@@ -1,9 +1,14 @@
 package types
 
-// nolint
 const (
-	ModuleName   = "identity"
-	StoreKey     = ModuleName
+	// ModuleName is the name of the module
+	ModuleName = "identity"
+
+	// StoreKey to be used when creating the KVStore
+	StoreKey = ModuleName
+
+  // RouterKey to be used for routing msgs
+  RouterKey = ModuleName
+
 	QuerierRoute = ModuleName
-	QueryAddress = "address"
 )

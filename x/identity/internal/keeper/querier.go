@@ -1,35 +1,40 @@
 package keeper
 
 import (
-	"encoding/json"
+	abci "github.com/tendermint/tendermint/abci/types"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/lcnem/identity/x/identity/internal/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-// NewQuerier is the module level router for state queries
-func NewQuerier(keeper Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
+// NewQuerier creates a new querier for identity clients.
+func NewQuerier(k Keeper) sdk.Querier {
+	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
 		case types.QueryAddress:
-			return queryAddress(ctx, path[1:], req, keeper)
+			return queryAddress(ctx, k, path[1])
+			// TODO: Put the modules query routes
 		default:
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown query endpoint")
+			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown identity query endpoint")
 		}
 	}
 }
 
-func queryAddress(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
-	address, err := sdk.AccAddressFromBech32(string(req.Data))
-
+func queryAddress(ctx sdk.Context, k Keeper, address string) ([]byte, error) {
+	params, err := k.Get(ctx, address)
 	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, address.String())
+		return nil, types.ErrIsNotRegistered
 	}
 
-	obj := keeper.Get(ctx, address)
-	res, _ := json.Marshal(obj)
+	res, err := codec.MarshalJSONIndent(types.ModuleCdc, params)
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+	}
 
 	return res, nil
 }
+
+// TODO: Add the modules query functions
+// They will be similar to the above one: queryParams()

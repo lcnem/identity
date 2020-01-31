@@ -6,124 +6,138 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/lcnem/identity/x/identity/client/cli"
-	"github.com/lcnem/identity/x/identity/client/rest"
+	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/lcnem/identity/x/identity/client/cli"
+	"github.com/lcnem/identity/x/identity/client/rest"
+	"github.com/lcnem/identity/x/identity/internal/types"
 )
 
-// type check to ensure the interface is properly implemented
 var (
-	_ module.AppModule      = AppModule{}
-	_ module.AppModuleBasic = AppModuleBasic{}
+	_ module.AppModule           = AppModule{}
+	_ module.AppModuleBasic      = AppModuleBasic{}
 )
 
-// AppModuleBasic is an app module Basics object
+// AppModuleBasic defines the basic application module used by the identity module.
 type AppModuleBasic struct{}
 
-// Name returns module name
+var _ module.AppModuleBasic = AppModuleBasic{}
+
+// Name returns the identity module's name.
 func (AppModuleBasic) Name() string {
-	return ModuleName
+	return types.ModuleName
 }
 
-// RegisterCodec returns RegisterCodec
+// RegisterCodec registers the identity module's types for the given codec.
 func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
 	RegisterCodec(cdc)
 }
 
-// DefaultGenesis returns default genesis state
+// DefaultGenesis returns default genesis state as raw bytes for the identity
+// module.
 func (AppModuleBasic) DefaultGenesis() json.RawMessage {
 	return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
 }
 
-// ValidateGenesis checks the Genesis
+// ValidateGenesis performs genesis state validation for the identity module.
 func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
 	var data GenesisState
-	if err := ModuleCdc.UnmarshalJSON(bz, &data); err != nil {
+	err := ModuleCdc.UnmarshalJSON(bz, &data)
+	if err != nil {
 		return err
 	}
-	// Once json successfully marshalled, passes along to genesis.go
 	return ValidateGenesis(data)
 }
 
-// RegisterRESTRoutes returns rest routes
+// RegisterRESTRoutes registers the REST routes for the identity module.
 func (AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Router) {
 	rest.RegisterRoutes(ctx, rtr)
 }
 
-// GetQueryCmd returns the root query command of this module
-func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
-	return cli.GetQueryCmd(cdc)
-}
-
-// GetTxCmd returns the root tx command of this module
+// GetTxCmd returns the root tx command for the identity module.
 func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	return cli.GetTxCmd(cdc)
 }
 
-// AppModule struct
-type AppModule struct {
-	AppModuleBasic
-	keeper Keeper
+// GetQueryCmd returns no root query command for the identity module.
+func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
+	return cli.GetQueryCmd(StoreKey, cdc)
 }
 
-// NewAppModule creates a new AppModule Object
-func NewAppModule(k Keeper) AppModule {
+//____________________________________________________________________________
+
+// AppModule implements an application module for the identity module.
+type AppModule struct {
+	AppModuleBasic
+
+	keeper        Keeper
+	// TODO: Add keepers that your application depends on
+}
+
+// NewAppModule creates a new AppModule object
+func NewAppModule(k Keeper, /*TODO: Add Keepers that your application depends on*/) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{},
-		keeper:         k,
+		AppModuleBasic:      AppModuleBasic{},
+		keeper:              k,
+		// TODO: Add keepers that your application depends on
 	}
 }
 
-// Name returns module name
+// Name returns the identity module's name.
 func (AppModule) Name() string {
 	return ModuleName
 }
 
-// RegisterInvariants is empty
-func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
+// RegisterInvariants registers the identity module invariants.
+func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
 
-// Route returns RouterKey
-func (am AppModule) Route() string {
+// Route returns the message routing key for the identity module.
+func (AppModule) Route() string {
 	return RouterKey
 }
 
-// NewHandler returns new Handler
+// NewHandler returns an sdk.Handler for the identity module.
 func (am AppModule) NewHandler() sdk.Handler {
 	return NewHandler(am.keeper)
 }
 
-// QuerierRoute returns module name
-func (am AppModule) QuerierRoute() string {
-	return ModuleName
+// QuerierRoute returns the identity module's querier route name.
+func (AppModule) QuerierRoute() string {
+	return QuerierRoute
 }
 
-// NewQuerierHandler returns new Querier
+// NewQuerierHandler returns the identity module sdk.Querier.
 func (am AppModule) NewQuerierHandler() sdk.Querier {
 	return NewQuerier(am.keeper)
 }
 
-// BeginBlock is a callback function
-func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
-
-// EndBlock is a callback function
-func (am AppModule) EndBlock(sdk.Context, abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return []abci.ValidatorUpdate{}
-}
-
-// InitGenesis inits genesis
+// InitGenesis performs genesis initialization for the identity module. It returns
+// no validator updates.
 func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState GenesisState
 	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
-	return InitGenesis(ctx, am.keeper, genesisState)
+	InitGenesis(ctx, am.keeper, genesisState)
+	return []abci.ValidatorUpdate{}
 }
 
-// ExportGenesis exports genesis
+// ExportGenesis returns the exported genesis state as raw bytes for the identity
+// module.
 func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
 	gs := ExportGenesis(ctx, am.keeper)
 	return ModuleCdc.MustMarshalJSON(gs)
+}
+
+// BeginBlock returns the begin blocker for the identity module.
+func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
+	BeginBlocker(ctx, req, am.keeper)
+}
+
+// EndBlock returns the end blocker for the identity module. It returns no validator
+// updates.
+func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+	return []abci.ValidatorUpdate{}
 }

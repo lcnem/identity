@@ -3,30 +3,40 @@ package cli
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
+
 	"github.com/lcnem/identity/x/identity/internal/types"
-	"github.com/spf13/cobra"
 )
 
-// nolint
-func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
-	coinQueryCmd := &cobra.Command{
+// GetQueryCmd returns the cli query commands for this module
+func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	// Group identity queries under a subcommand
+	identityQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "Querying commands for the idnetity module",
+		Short:                      fmt.Sprintf("Querying commands for the %s module", types.ModuleName),
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	coinQueryCmd.AddCommand(flags.GetCommands(
-		getCmdGet(cdc),
-	)...)
-	return coinQueryCmd
+
+	identityQueryCmd.AddCommand(
+		flags.GetCommands(
+			// TODO: Add query Cmds
+			GetCmdGet(cdc),
+		)...,
+	)
+
+	return identityQueryCmd
+
 }
 
-func getCmdGet(cdc *codec.Codec) *cobra.Command {
+// TODO: Add Query Commands
+func GetCmdGet(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "get [address]",
 		Short: "get address data",

@@ -1,15 +1,13 @@
 package rest
 
 import (
-	"github.com/cosmos/cosmos-sdk/client/context"
-
 	"github.com/gorilla/mux"
+
+	"github.com/cosmos/cosmos-sdk/client/context"
 )
 
-// RegisterRoutes - Central function to define routes that get registered by the main application
+// RegisterRoutes registers identity-related REST handlers to a router
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/identity/accounts/{address}", getHandler(cliCtx)).Methods("GET")
-	r.HandleFunc("/identity/accounts/{address}", setHandler(cliCtx)).Methods("PUT")
-	r.HandleFunc("/identity/accounts/{address}/import", importHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/identity/accounts/{address}", deleteHandler(cliCtx)).Methods("DELETE")
+	registerQueryRoutes(cliCtx, r)
+	registerTxRoutes(cliCtx, r)
 }
