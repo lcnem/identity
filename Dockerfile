@@ -10,15 +10,10 @@ RUN go install ./cmd/identityd
 RUN go install ./cmd/identitycli
 
 # Final image
-FROM ubuntu:latest
+FROM alpine:edge
 
-RUN set -x && \
-  apt update && \
-  apt upgrade -y && \
-  apt install -y --no-install-recommends && \
-  apt -y clean && \
-  apt autoremove --purge -y
-
+# Install ca-certificates
+RUN apk add --update ca-certificates
 WORKDIR /root
 
 COPY scripts/genesis.json genesis.json
