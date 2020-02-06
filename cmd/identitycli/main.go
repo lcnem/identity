@@ -71,8 +71,8 @@ func main() {
 		flags.NewCompletionCmd(rootCmd, true),
 	)
 
-	// Add flags and prefix all env exposed with AA
-	executor := cli.PrepareMainCmd(rootCmd, "AA", app.DefaultCLIHome)
+	// Add flags and prefix all env exposed with IDENTITY
+	executor := cli.PrepareMainCmd(rootCmd, "IDENTITY", app.DefaultCLIHome)
 
 	err := executor.Execute()
 	if err != nil {
