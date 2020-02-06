@@ -4,6 +4,14 @@
 
 https://hub.docker.com/r/lcnem/identity/
 
+## イメージのビルド
+
+上記のイメージを使わず、リポジトリ内の Dockerfile を使用する場合は、次のコマンドでイメージをビルドしてください。
+
+```shell
+docker build -t lcnem/identity .
+```
+
 ## ノードの準備
 
 testnetへ接続するための初期化を行います。
