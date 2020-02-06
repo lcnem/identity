@@ -25,6 +25,9 @@ var (
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
 	// TODO: Fill out function aliases
+	NewMsgSet    = types.NewMsgSet
+	NewMsgImport = types.NewMsgImport
+	NewMsgDelete = types.NewMsgDelete
 
 	// variable aliases
 	ModuleCdc = types.ModuleCdc
